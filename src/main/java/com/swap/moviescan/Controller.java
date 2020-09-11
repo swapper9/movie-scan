@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 public class Controller {
 
@@ -26,5 +28,11 @@ public class Controller {
     public ResponseEntity<Film> filmsById(
         @PathVariable(value = "id") int id) {
         return kinoPoiskApi.filmsById(id);
+    }
+
+    @GetMapping(value = "/films/like/{id}")
+    public ResponseEntity<List<String>> filmsLikeId(
+        @PathVariable(value = "id") int id) {
+        return kinoPoiskApi.filmsLikeById(id);
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.Collections;
+import java.util.List;
 
 @Service
 public class KinoPoiskApi {
@@ -29,6 +30,9 @@ public class KinoPoiskApi {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private Parser parser;
 
     public ResponseEntity<SearchByKeywordResponse> searchByKeyword(String keyword, String page) {
         HttpHeaders headers = getHttpHeaders();
@@ -56,5 +60,9 @@ public class KinoPoiskApi {
         headers.setContentType(MediaType.valueOf("application/json; charset=utf-8"));
         headers.setAccept(Collections.singletonList(MediaType.valueOf("application/json; charset=utf-8")));
         return headers;
+    }
+
+    public ResponseEntity<List<String>> filmsLikeById(int id) {
+        return parser.scanPageForRecommendations("https://kinopoisk.ru/film/" + id + "/like");
     }
 }
