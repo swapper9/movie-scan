@@ -1,6 +1,7 @@
 package com.swap.moviescan;
 
-import com.swap.moviescan.data.KinoPoiskApiResponse;
+import com.swap.moviescan.data.Film;
+import com.swap.moviescan.data.SearchByKeywordResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -23,21 +24,37 @@ public class KinoPoiskApi {
     @Value("${kinopoisk.api.search-by-keyword}")
     private String searchByKeyword;
 
+    @Value("${kinopoisk.api.films}")
+    private String films;
+
     @Autowired
     private RestTemplate restTemplate;
 
-    public ResponseEntity<KinoPoiskApiResponse> scanMovie(String keyword) {
+    public ResponseEntity<SearchByKeywordResponse> searchByKeyword(String keyword, String page) {
+        HttpHeaders headers = getHttpHeaders();
+        URI uri = UriComponentsBuilder
+                .fromHttpUrl(kinopoiskApiUrl + searchByKeyword)
+                .queryParam("keyword", keyword)
+                .queryParam("page", page)
+                .build().encode().toUri();
+        HttpEntity entity = new HttpEntity(headers);
+        return restTemplate.exchange(uri, HttpMethod.GET, entity, SearchByKeywordResponse.class);
+    }
+
+    public ResponseEntity<Film> filmsById(int id) {
+        HttpHeaders headers = getHttpHeaders();
+        URI uri = UriComponentsBuilder
+            .fromHttpUrl(kinopoiskApiUrl + films + id)
+            .build().encode().toUri();
+        HttpEntity entity = new HttpEntity(headers);
+        return restTemplate.exchange(uri, HttpMethod.GET, entity, Film.class);
+    }
+
+    private HttpHeaders getHttpHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-API-KEY", kinopoiskApiKey);
         headers.setContentType(MediaType.valueOf("application/json; charset=utf-8"));
         headers.setAccept(Collections.singletonList(MediaType.valueOf("application/json; charset=utf-8")));
-        URI uri = UriComponentsBuilder
-                .fromHttpUrl(kinopoiskApiUrl + searchByKeyword)
-                .queryParam("keyword", keyword)
-                .queryParam("page", "1")
-                .build().encode().toUri();
-        HttpEntity entity = new HttpEntity(headers);
-        ResponseEntity<KinoPoiskApiResponse> response = restTemplate.exchange(uri, HttpMethod.GET, entity, KinoPoiskApiResponse.class);
-        return response;
+        return headers;
     }
 }
