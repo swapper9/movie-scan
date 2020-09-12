@@ -3,6 +3,7 @@ package com.swap.moviescan;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -15,12 +16,15 @@ import java.util.stream.Collectors;
 @Component
 public class Parser {
 
+    @Value("${site.url}")
+    private String siteUrl;
+
     public ResponseEntity<List<String>> scanPageForRecommendations(String parentUrl) {
-        List<String> firstRecommendationsList = getElements(parentUrl, "http://www.google.com");
+        List<String> likeList = getElements(parentUrl, "http://www.google.com");
         List<String> recOfRecsList = new ArrayList<>();
-        for (String recUrl : firstRecommendationsList) {
-            getElements("https://kinopoisk.ru" + recUrl + "like/", parentUrl);
-            recOfRecsList.addAll(firstRecommendationsList);
+        for (String recUrl : likeList) {
+            getElements(siteUrl + recUrl + "like/", parentUrl);
+            recOfRecsList.addAll(likeList);
         }
         return new ResponseEntity<>(recOfRecsList, HttpStatus.OK);
     }
