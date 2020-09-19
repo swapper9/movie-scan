@@ -1,6 +1,5 @@
-package com.swap.moviescan;
+package com.swap.moviescan.data;
 
-import com.swap.moviescan.data.Frames;
 import lombok.Data;
 
 @Data
